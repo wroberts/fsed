@@ -219,5 +219,16 @@ class TestAhocorasick(unittest.TestCase):
         '''Run doctests.'''
         self.assertTrue(doctest.testmod(raise_on_error=True))
 
+    def test_boundary_transform(self):
+        '''
+        Test the boundary_transform.
+        '''
+        self.assertEqual(''.join(ahocorasick.boundary_transform('abc')),
+                         '\x00abc\x00')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('abc def')),
+                         '\x00abc\x00 \x00def\x00')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('  abc def  ')),
+                         '  \x00abc\x00 \x00def\x00  ')
+
 if __name__ == '__main__':
     unittest.main()
