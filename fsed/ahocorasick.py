@@ -354,3 +354,70 @@ class AhoCorasickTrie(Trie):
                         #    best_value))
         # now the optimal solution is stored at the top of the chart
         return chart[len(seq)-1][0][1]
+
+    def greedy_replace(self, seq):
+        if not self._suffix_links_set:
+            self._set_suffix_links()
+        rv = ''
+        buffered = ''
+        current = self.root
+        for char in seq:
+            # find a state where we can transition on char
+            # greedily match on has_value or has_dict_suffix
+            # otherwise move by suffix
+            while char not in current:
+                if current.has_value:
+                    # match
+                    rv += buffered[:-current.depth]
+                    rv += current.value
+                    buffered = ''
+                    current = self.root
+                    break
+                elif current.has_dict_suffix:
+                    # match
+                    current = current.dict_suffix
+                    rv += buffered[:-current.depth]
+                    rv += current.value
+                    buffered = ''
+                    current = self.root
+                    break
+                elif current.has_suffix:
+                    # transition by suffix
+                    current = current.suffix
+                else:
+                    break
+            if current.has_value:
+                # match
+                rv += buffered[:-current.depth]
+                rv += current.value
+                buffered = ''
+                current = self.root
+            elif current.has_dict_suffix:
+                # match
+                current = current.dict_suffix
+                rv += buffered[:-current.depth]
+                rv += current.value
+                buffered = ''
+                current = self.root
+            if char in current:
+                current = current[char]
+                buffered += char
+            else:
+                # here we must be in the root
+                assert current is self.root
+                # we cannot move on char, so just output it and stay
+                # in root
+                rv += char
+        if current.has_value:
+            # match
+            rv += buffered[:-current.depth]
+            rv += current.value
+        elif current.has_dict_suffix:
+            # match
+            current = current.dict_suffix
+            rv += buffered[:-current.depth]
+            rv += current.value
+        elif buffered:
+            rv += buffered
+        return rv
+
