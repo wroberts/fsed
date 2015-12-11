@@ -19,7 +19,7 @@ def make_input_acsr(batch_filename, input_filename, output_filename):
             line = line.decode('utf-8').strip()
             candidates.append(line)
     logger.info('{} MWE candidates loaded'.format(len(candidates)))
-    trie = ahocorasick.AhoCorasickTrie()
+    trie = fsed.ahocorasick.AhoCorasickTrie()
     for cand in candidates:
         trie[cand] = cand.replace(' ', '_')
     # search and replace on the
