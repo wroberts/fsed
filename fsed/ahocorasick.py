@@ -8,8 +8,7 @@ ahocorasick.py
 Second attempt writing Aho-Corasick string matching in Python.
 '''
 
-from __future__ import absolute_import
-from __future__ import division, print_function, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 from collections import deque
 import sys
 import logging
