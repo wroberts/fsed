@@ -421,3 +421,22 @@ class AhoCorasickTrie(Trie):
             rv += buffered
         return rv
 
+def boundary_transform(seq):
+    in_word = False
+    for char in seq:
+        if char in ' \t\v\r\n':
+            if in_word:
+                yield '\x00'
+            in_word = False
+        else:
+            if not in_word:
+                yield '\x00'
+            in_word = True
+        yield char
+    if in_word:
+        yield '\x00'
+
+def boundary_untransform(seq):
+    for char in seq:
+        if char != '\x00':
+            yield char
