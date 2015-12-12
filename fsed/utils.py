@@ -18,8 +18,8 @@ def open_file(filename, mode='r'):
 
     f = utils.open_file('../semcor-parsed.zip:semcor000.txt')
     """
-    if (hasattr(filename, 'read') and
-        hasattr(filename, 'write') and
+    if (('r' not in mode or hasattr(filename, 'read')) and
+        (('a' not in mode and 'w' not in mode) or hasattr(filename, 'write')) and
         hasattr(filename, '__iter__')):
         return filename
     elif isinstance(filename, basestring):
