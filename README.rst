@@ -66,7 +66,7 @@ In this format, there must be only one ``<TAB>`` character per line.
 Patterns can contain escape characters:
 
 ``\\``
-    Backslash (\)
+    Backslash (\\)
 
 ``\a``
     ASCII bell (BEL)
