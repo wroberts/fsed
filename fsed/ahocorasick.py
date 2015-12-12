@@ -12,9 +12,10 @@ from __future__ import absolute_import, print_function, unicode_literals
 from collections import deque
 import sys
 import logging
+
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                     stream=sys.stderr, level=logging.INFO)
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 # ============================================================
@@ -356,7 +357,6 @@ class AhoCorasickTrie(Trie):
         return chart[len(seq)-1][0][1]
 
     def greedy_replace(self, seq):
-        #import pdb; pdb.set_trace()
         if not self._suffix_links_set:
             self._set_suffix_links()
         # start at the root
