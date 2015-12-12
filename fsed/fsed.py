@@ -167,7 +167,7 @@ def rewrite_str_with_trie(sval, trie, boundaries = False, slow = False):
 @click.command()
 @click.argument('pattern_filename', type=click.Path(exists=True),
                 metavar='PATTERN_FILE')
-@click.argument('input_filenames', default='-', nargs=-1,
+@click.argument('input_filenames', nargs=-1,
                 type=click.Path(exists=True), metavar='[INPUT_FILES]')
 @click.option('--pattern-format', type=click.Choice(['auto', 'tsv', 'sed']),
               default='auto', show_default=True,
