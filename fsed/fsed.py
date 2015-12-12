@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import, print_function, unicode_literals
+import fsed.utils import open_file
 import click
 import fsed.ahocorasick
 import logging
@@ -26,7 +27,7 @@ def set_log_level(verbose, quiet):
 
 def build_trie(pattern_filename, pattern_format, on_word_boundaries):
     candidates = []
-    with utils.open_file(batch_filename) as batch_file:
+    with open_file(batch_filename) as batch_file:
         for line in batch_file:
             line = line.decode('utf-8').strip()
             candidates.append(line)
@@ -40,7 +41,7 @@ def build_trie(pattern_filename, pattern_format, on_word_boundaries):
 @click.argument('pattern_filename', type=click.Path(exists=True),
                 metavar='PATTERN_FILE')
 @click.argument('input_filenames', default='-', nargs=-1,
-                metavar='[INPUT_FILES]')
+                type=click.Path(exists=True), metavar='[INPUT_FILES]')
 @click.option('--pattern-format', type=click.Choice(['tsv', 'sed']),
               default='sed', show_default=True,
               help='Specify the format of PATTERN_FILE')
@@ -77,20 +78,25 @@ def main(pattern_filename, input_filenames, pattern_format,
     LOGGER.info('fsed {} input {} output {}'.format(pattern_filename,
                                                     input_filenames,
                                                     output_filename))
+    if not input_filenames:
+        input_filenames = ('-',)
+    if not output_filename:
+        output_filename = '-'
     # build trie machine for matching
     trie = build_trie(pattern_filename, pattern_format, words)
-    # search and replace on the
-    with utils.open_file(input_filename) as input_file:
-        with utils.open_file(output_filename, 'w') as output_file:
-            LOGGER.info('writing {} to {}'.format(input_filename,
-                                                  output_filename))
-            num_lines = 0
-            for line in input_file:
-                line = line.decode('utf-8').strip()
-                line = trie.greedy_replace_w_sep(line)
-                output_file.write((line + '\n').encode('utf-8'))
-                num_lines += 1
-            LOGGER.info('{} lines written'.format(num_lines))
+    with open_file(output_filename, 'w') as output_file:
+        for input_filename in input_filenames:
+            # search and replace
+            with open_file(input_filename) as input_file:
+                LOGGER.info('writing {} to {}'.format(input_filename,
+                                                      output_filename))
+                num_lines = 0
+                for line in input_file:
+                    line = line.decode('utf-8').strip()
+                    line = trie.greedy_replace_w_sep(line)
+                    output_file.write((line + '\n').encode('utf-8'))
+                    num_lines += 1
+                LOGGER.info('{} lines written'.format(num_lines))
 
 if __name__ == '__main__':
     main()
