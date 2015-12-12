@@ -41,14 +41,14 @@ class TrieNode(dict):
     def __unicode__(self):
         if self.depth == 0:
             return '<ROOT>'
-        rv = self.prefix
+        retval = self.prefix
         if self.has_value:
-            rv += ' (value = "{}")'.format(self._value)
+            retval += ' (value = "{}")'.format(self._value)
         if self.has_suffix:
-            rv += ' (suffix = "{}")'.format(self.suffix.prefix)
+            retval += ' (suffix = "{}")'.format(self.suffix.prefix)
         if self.has_dict_suffix:
-            rv += ' (dict_suffix = "{}")'.format(self.dict_suffix.prefix)
-        return rv
+            retval += ' (dict_suffix = "{}")'.format(self.dict_suffix.prefix)
+        return retval
 
     def __repr__(self):
         return '<TrieNode prefix "{}" keys {}>'.format(self.prefix, self.keys())
@@ -59,17 +59,23 @@ class TrieNode(dict):
         return self._value
 
     @value.setter
-    def value(self, v):
+    def value(self, newval):
         '''Sets this node's value.'''
-        self._value = v
+        self._value = newval
         self.has_value = True
 
     @property
     def has_suffix(self):
+        '''
+        Boolean: does this node have a suffix link or not?
+        '''
         return self.suffix is not None
 
     @property
     def has_dict_suffix(self):
+        '''
+        Boolean: does this node have a dictionary link or not?
+        '''
         return self.dict_suffix is not None
 
 
@@ -117,6 +123,9 @@ class Trie(object):
         current.value = value
 
     def pretty_print(self):
+        '''
+        Prints this trie's structure to standard output for debugging.
+        '''
         # dfs
         todo = [self.root]
         while todo:
@@ -145,6 +154,9 @@ class AhoCorasickTrie(Trie):
             self._reset_suffix_links()
 
     def _reset_suffix_links(self):
+        '''
+        Reset all suffix links in all nodes in this trie.
+        '''
         self._suffix_links_set = False
         # dfs
         todo = [self.root]
@@ -156,6 +168,9 @@ class AhoCorasickTrie(Trie):
             current.dict_suffix = None
 
     def _set_suffix_links(self):
+        '''
+        Sets all suffix links in all nodes in this trie.
+        '''
         self._suffix_links_set = True
         # bfs
         todo = deque([(self.root[char], self.root) for char in self.root])
@@ -211,7 +226,7 @@ class AhoCorasickTrie(Trie):
                 # we must be at the root node
                 assert current is self.root
                 # throw out the char without doing anything
-                pass
+                # pass
             # now perform any matching on the current node
             if current.has_value:
                 yield (1 + pos - current.depth, current.depth, current.value)
@@ -224,7 +239,7 @@ class AhoCorasickTrie(Trie):
         if not self._suffix_links_set:
             self._set_suffix_links()
         current = self.root
-        rv = ''
+        retval = ''
         buffered = ''
         seq_len_l1 = len(seq) - 1
         for pos, char in enumerate(seq):
@@ -234,7 +249,7 @@ class AhoCorasickTrie(Trie):
                 current = current[char]
                 buffered += char
             else:
-                rv += buffered + char
+                retval += buffered + char
                 buffered = ''
             reduced = False
             if current.has_value:
@@ -244,7 +259,7 @@ class AhoCorasickTrie(Trie):
                 begin_boundary = begin_pos < 0 or seq[begin_pos] == ' '
                 end_boundary = pos == seq_len_l1 or seq[pos+1] == ' '
                 if begin_boundary and end_boundary:
-                    rv += buffered[:-depth] + value
+                    retval += buffered[:-depth] + value
                     buffered = ''
                     current = self.root
                     reduced = True
@@ -255,7 +270,7 @@ class AhoCorasickTrie(Trie):
                 begin_boundary = begin_pos < 0 or seq[begin_pos] == ' '
                 end_boundary = pos == seq_len_l1 or seq[pos+1] == ' '
                 if begin_boundary and end_boundary:
-                    rv += buffered[:-depth] + value
+                    retval += buffered[:-depth] + value
                     buffered = ''
                     current = self.root
                     reduced = True
@@ -267,7 +282,7 @@ class AhoCorasickTrie(Trie):
             begin_boundary = begin_pos < 0 or seq[begin_pos] == ' '
             end_boundary = pos == seq_len_l1 or seq[pos+1] == ' '
             if begin_boundary and end_boundary:
-                rv += buffered[:-depth] + value
+                retval += buffered[:-depth] + value
                 reduced = True
         if not reduced and current.has_dict_suffix:
             # scan back to find the char before current started
@@ -276,11 +291,11 @@ class AhoCorasickTrie(Trie):
             begin_boundary = begin_pos < 0 or seq[begin_pos] == ' '
             end_boundary = pos == seq_len_l1 or seq[pos+1] == ' '
             if begin_boundary and end_boundary:
-                rv += buffered[:-depth] + value
+                retval += buffered[:-depth] + value
                 reduced = True
         if not reduced:
-            rv += buffered
-        return rv
+            retval += buffered
+        return retval
 
     def replace(self, seq):
         '''
@@ -302,7 +317,7 @@ class AhoCorasickTrie(Trie):
         # we initialise chart by filling in row 0:
         #    each cell gets assigned (0, char), where char is the character at
         #    the corresponding position in the input string
-        chart = [ [None for i in range(len(seq)) ] for i in range(len(seq)) ]
+        chart = [ [None for _i in range(len(seq)) ] for _i in range(len(seq)) ]
         chart[0] = [(0, char) for char in seq]
         # now we fill in the chart using the results from the aho-corasick
         # string matches
@@ -357,6 +372,13 @@ class AhoCorasickTrie(Trie):
         return chart[len(seq)-1][0][1]
 
     def greedy_replace(self, seq):
+        '''
+        Greedily matches strings in ``seq``, and replaces them with their
+        node values.
+
+        Arguments:
+        - `seq`: an iterable of characters to perform search-and-replace on
+        '''
         if not self._suffix_links_set:
             self._set_suffix_links()
         # start at the root
@@ -409,6 +431,15 @@ class AhoCorasickTrie(Trie):
 WHITESPACE_CHARS = ' \t\v\r\n'
 
 def boundary_transform(seq, force_edges = True):
+    '''
+    Wraps all word transitions with a boundary token character (\x00).
+    If desired (with ``force_edges`` set to ``True``), this inserts
+    the boundary character at the beginning and end of the string.
+
+    Arguments:
+    - `seq`:
+    - `force_edges = True`:
+    '''
     gen = boundary_words(seq)
     if force_edges:
         gen = boundary_edges(gen)
@@ -417,6 +448,12 @@ def boundary_transform(seq, force_edges = True):
         yield char
 
 def boundary_words(seq):
+    '''
+    Wraps all word transitions with a boundary token character (\x00).
+
+    Arguments:
+    - `seq`:
+    '''
     in_word = None
     for char in seq:
         if char == '\x00' and in_word is not None:
@@ -432,12 +469,26 @@ def boundary_words(seq):
         yield char
 
 def boundary_edges(seq):
+    '''
+    Inserts the boundary token character before and after the given
+    string.
+
+    Arguments:
+    - `seq`:
+    '''
     yield '\x00'
     for char in seq:
         yield char
     yield '\x00'
 
 def remove_duplicates(seq):
+    '''
+    Removes duplicate boundary token characters from the given
+    character iterable.
+
+    Arguments:
+    - `seq`:
+    '''
     last_boundary = False
     for char in seq:
         if char == '\x00':
@@ -449,6 +500,13 @@ def remove_duplicates(seq):
             yield char
 
 def boundary_untransform(seq):
+    '''
+    Removes boundary token characters from the given character
+    iterable.
+
+    Arguments:
+    - `seq`:
+    '''
     for char in seq:
         if char != '\x00':
             yield char
