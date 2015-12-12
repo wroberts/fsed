@@ -216,7 +216,7 @@ def main(pattern_filename, input_filenames, pattern_format,
                     num_lines = 0
                     for line in input_file:
                         line = line.decode(encoding).rstrip('\n')
-                        line = rewrite_str_with_trie(sval, trie, boundaries, slow)
+                        line = rewrite_str_with_trie(line, trie, boundaries, slow)
                         output_file.write((line + '\n').encode(encoding))
                         num_lines += 1
                     LOGGER.info('{} lines written'.format(num_lines))
