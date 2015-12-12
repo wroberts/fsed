@@ -100,9 +100,6 @@ def debug3():
       c (value = "(c)") (suffix = "")
         ca (suffix = "a") (dict_suffix = "a")
           caa (value = "(caa)") (suffix = "a") (dict_suffix = "a")
-    [(0, 1, u'(a)'), (0, 2, u'(ab)'), (1, 2, u'(bc)'), (2, 1, u'(c)'), (3, 1, u'(c)'), (4, 1, u'(a)'), (4, 2, u'(ab)')]
-    (a)(bc)(c)(ab)
-    (a)(bc)(c)(a)b
     '''
     t = ahocorasick.AhoCorasickTrie()
     t['a'] = '(a)'
@@ -114,9 +111,6 @@ def debug3():
     t['caa'] = '(caa)'
     t._set_suffix_links()
     t.pretty_print()
-    print(list(t.find_all('abccab')))
-    print(t.replace('abccab'))
-    print(t.greedy_replace('abccab'))
 
 def debug4():
     '''
@@ -128,12 +122,6 @@ def debug4():
         xa (suffix = "a")
           xab (suffix = "ab") (dict_suffix = "ab")
             xabc (value = "(xabc)") (suffix = "")
-    [(0, 1, u'(x)'), (1, 2, u'(ab)'), (0, 4, u'(xabc)')]
-    (xabc)
-    (x)(ab)c
-    [(0, 1, u'(x)'), (1, 2, u'(ab)')]
-    (x)(ab)d
-    (x)(ab)d
     '''
     t = ahocorasick.AhoCorasickTrie()
     t['x'] = '(x)'
@@ -141,12 +129,6 @@ def debug4():
     t['ab'] = '(ab)'
     t._set_suffix_links()
     t.pretty_print()
-    print(list(t.find_all('xabc')))
-    print(t.replace('xabc'))
-    print(t.greedy_replace('xabc'))
-    print(list(t.find_all('xabd')))
-    print(t.replace('xabd'))
-    print(t.greedy_replace('xabd'))
 
 def debug5():
     '''
@@ -158,9 +140,6 @@ def debug5():
           aca (suffix = "a")
             acab (suffix = "ab") (dict_suffix = "ab")
               acabx (value = "(acabx)") (suffix = "")
-    [(0, 2, u'(ac)'), (2, 2, u'(ab)')]
-    (ac)(ab)y
-    (ac)(ab)y
     '''
     t = ahocorasick.AhoCorasickTrie()
     t['ac'] = '(ac)'
@@ -168,20 +147,17 @@ def debug5():
     t['ab'] = '(ab)'
     t._set_suffix_links()
     t.pretty_print()
-    print(list(t.find_all('acaby')))
-    print(t.replace('acaby'))
-    print(t.greedy_replace('acaby'))
 
-def debug6():
-    '''
-    >>> debug6()
-    my (dog) is a (ca) catty (cat) (cat)
-    '''
-    t = ahocorasick.AhoCorasickTrie()
-    t['dog'] = '(dog)'
-    t['ca'] = '(ca)'
-    t['cat'] = '(cat)'
-    print(t.greedy_replace_w_sep('my dog is a ca catty cat cat'))
+# def debug6():
+#     '''
+#     >>> debug6()
+#     my (dog) is a (ca) catty (cat) (cat)
+#     '''
+#     t = ahocorasick.AhoCorasickTrie()
+#     t['dog'] = '(dog)'
+#     t['ca'] = '(ca)'
+#     t['cat'] = '(cat)'
+#     print(t.greedy_replace_w_sep('my dog is a ca catty cat cat'))
 
 def debug7():
     '''
@@ -282,6 +258,57 @@ class TestAhocorasick(unittest.TestCase):
                          'abc\x00 \x00def\x00')
         self.assertEqual(''.join(ahocorasick.boundary_transform('\x00abc def\x00', False)),
                          '\x00abc\x00 \x00def\x00')
+
+    def test_debug3(self):
+        t = ahocorasick.AhoCorasickTrie()
+        t['a'] = '(a)'
+        t['ab'] = '(ab)'
+        t['bab'] = '(bab)'
+        t['bc'] = '(bc)'
+        t['bca'] = '(bca)'
+        t['c'] = '(c)'
+        t['caa'] = '(caa)'
+        t._set_suffix_links()
+        self.assertEqual(list(t.find_all('abccab')),
+                         [(0, 1, '(a)'), (0, 2, '(ab)'), (1, 2, '(bc)'),
+                          (2, 1, '(c)'), (3, 1, '(c)'), (4, 1, '(a)'),
+                          (4, 2, '(ab)')])
+        self.assertEqual(t.replace('abccab'),
+                         '(a)(bc)(c)(ab)')
+        self.assertEqual(t.greedy_replace('abccab'),
+                         '(a)(bc)(c)(a)b')
+
+    def test_debug4(self):
+        t = ahocorasick.AhoCorasickTrie()
+        t['x'] = '(x)'
+        t['xabc'] = '(xabc)'
+        t['ab'] = '(ab)'
+        t._set_suffix_links()
+        self.assertEqual(list(t.find_all('xabc')),
+                         [(0, 1, '(x)'), (1, 2, '(ab)'), (0, 4, '(xabc)')])
+        self.assertEqual(t.replace('xabc'),
+                         '(xabc)')
+        self.assertEqual(t.greedy_replace('xabc'),
+                         '(x)(ab)c')
+        self.assertEqual(list(t.find_all('xabd')),
+                         [(0, 1, '(x)'), (1, 2, '(ab)')])
+        self.assertEqual(t.replace('xabd'),
+                         '(x)(ab)d')
+        self.assertEqual(t.greedy_replace('xabd'),
+                         '(x)(ab)d')
+
+    def test_debug5(self):
+        t = ahocorasick.AhoCorasickTrie()
+        t['ac'] = '(ac)'
+        t['acabx'] = '(acabx)'
+        t['ab'] = '(ab)'
+        t._set_suffix_links()
+        self.assertEqual(list(t.find_all('acaby')),
+                         [(0, 2, '(ac)'), (2, 2, '(ab)')])
+        self.assertEqual(t.replace('acaby'),
+                         '(ac)(ab)y')
+        self.assertEqual(t.greedy_replace('acaby'),
+                         '(ac)(ab)y')
 
 
 if __name__ == '__main__':

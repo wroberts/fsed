@@ -10,15 +10,18 @@ Test the ``fsed`` module.
 
 from __future__ import absolute_import, print_function, unicode_literals
 from .. import fsed
-import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import BytesIO as StringIO
 import unittest
 
-class CMStringIO(StringIO.StringIO):
+class CMStringIO(StringIO):
     '''StringIO object with context manager.'''
 
     def __init__(self, *args, **kwargs):
         '''Ctor.'''
-        StringIO.StringIO.__init__(self, *args, **kwargs)
+        StringIO.__init__(self, *args, **kwargs)
 
     def __enter__(self):
         self.seek(0)
@@ -27,7 +30,7 @@ class CMStringIO(StringIO.StringIO):
     def __exit__(self, _type, _value, _tb):
         pass
 
-PATTERN_TSV = '''\\bMarco Polo\tMarco_Polo
+PATTERN_TSV = b'''\\bMarco Polo\tMarco_Polo
 Kublai Khan\tKublai_Khan
 Christopher Columbus\tChristopher_Columbus
 and uncle\tand_uncle'''

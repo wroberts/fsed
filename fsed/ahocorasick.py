@@ -133,7 +133,7 @@ class Trie(object):
             for char in reversed(sorted(current.keys())):
                 todo.append(current[char])
             indent = ' ' * (current.depth * 2)
-            print(indent + unicode(current))
+            print(indent + current.__unicode__())
 
 
 # ============================================================
