@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''
+fsed.py
+(c) Will Roberts  12 December, 2015
+
+Main module for the ``fsed`` command line utility.
+'''
+
 from __future__ import absolute_import, print_function, unicode_literals
 from fsed.utils import open_file
 import click
@@ -21,7 +28,6 @@ def set_log_level(verbose, quiet):
     - `verbose`:
     - `quiet`:
     '''
-    '''Sets the logging level.'''
     if quiet:
         verbose = -1
     if verbose < 0:
