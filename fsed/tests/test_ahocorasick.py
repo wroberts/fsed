@@ -209,6 +209,23 @@ def debug7():
     t._set_suffix_links()
     t.pretty_print()
 
+def debug8():
+    '''
+    >>> debug8()
+    carry (cat) (cat) car(cat) (cart) car
+    my (dog) is a (ca) catty (cat) (cat)
+    '''
+    t = ahocorasick.AhoCorasickTrie()
+    t['cart'] = '(cart)'
+    t['cat'] = '(cat)'
+    print(t.greedy_replace('carry cat cat carcat cart car'))
+    t = ahocorasick.AhoCorasickTrie()
+    t[ahocorasick.boundary_transform('dog')] = '(dog)'
+    t[ahocorasick.boundary_transform('ca')] = '(ca)'
+    t[ahocorasick.boundary_transform('cat')] = '(cat)'
+    print(''.join(ahocorasick.boundary_untransform(
+        t.greedy_replace(ahocorasick.boundary_transform('my dog is a ca catty cat cat')))))
+
 
 class TestAhocorasick(unittest.TestCase):
     '''
