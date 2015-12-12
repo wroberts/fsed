@@ -40,26 +40,25 @@ def build_trie(pattern_filename, pattern_format, on_word_boundaries):
 @click.argument('pattern_filename', type=click.Path(exists=True),
                 metavar='PATTERN_FILE')
 @click.argument('input_filenames', default='-', nargs=-1,
-                metavar='INPUT_FILES')
+                metavar='[INPUT_FILES]')
 @click.option('--pattern-format', type=click.Choice(['tsv', 'sed']),
               default='sed', show_default=True,
-              help='Set FMT to "tsv" or "sed" to specify the format '
-              'of PATTERN_FILE')
+              help='Specify the format of PATTERN_FILE')
 @click.option('-o', '--output', 'output_filename', type=click.Path(),
-              help='Specifies that the program output should be written '
-              'to this file. If this option is not used, fsed writes '
+              help='Program output is written '
+              'to this file. Default is to write '
               'to standard output.')
 @click.option('-w', '--words', is_flag=True,
-              help='Makes fsed match only on word boundaries; this '
-              'flag instructs fsed to append "\b" to the beginning and '
+              help='Match only on word boundaries: '
+              'appends "\\b" to the beginning and '
               'end of every pattern in PATTERN_FILE.')
 @click.option('--by-line/--across-lines', default=False,
-              help='Sets whether fsed should process the input line by '
+              help='Process the input line by '
               'line or character by character; the default is --across-lines.')
 @click.option('--slow', is_flag=True,
-              help='Indicates that fsed should try very hard to always '
+              help='Try very hard to '
               'find the longest matches on the input; this is very slow, '
-              'and forces --by-line to be on.')
+              'and forces --by-line.')
 @click.option('-v', '--verbose', default=0, count=True,
               help='Turns on debugging output.')
 @click.option('-q', '--quiet', is_flag=True,
@@ -68,9 +67,12 @@ def main(pattern_filename, input_filenames, pattern_format,
          output_filename,
          words, by_line, slow, verbose, quiet):
     '''
-    Search and replace on file(s), with matching on fixed strings.
+    Search and replace on INPUT_FILE(s) (or standard input), with
+    matching on fixed strings.
     '''
     set_log_level(verbose, quiet)
+    if slow:
+        by_line = True
     # load the batch
     LOGGER.info('fsed {} input {} output {}'.format(pattern_filename,
                                                     input_filenames,
