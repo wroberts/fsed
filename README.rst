@@ -22,6 +22,11 @@ Options:
     Specifies that the program output should be written to ``OUTFILE``.
     If this option is not used, ``fsed`` writes to standard output.
 
+``-w/--words``
+    Makes ``fsed`` match only on word boundaries; this flag instructs
+    ``fsed`` to append ``\b`` to the beginning and end of every
+    pattern in ``PATTERN_FILE``.
+
 ``--by-line/--across-lines``
     Sets whether ``fsed`` should process the input line by line
     or character by character; the default is ``--across-lines``.
@@ -37,9 +42,6 @@ Options:
 ``-v/--verbose``
     Turns on debugging output.
 
-``--version``
-    Show version information and quit.
-
 Pattern File
 ============
 
@@ -51,8 +53,8 @@ does::
 
     s/SEARCH/REPLACE/
 
-The character following the ``s`` character is the delimiter, and can
-be any character (it does not have to be a forward slash).
+The character following the ``s`` character is the pattern delimiter,
+and can be any character (it does not have to be a forward slash).
 
 The other format, ``tsv``, specifies patterns using ``<TAB>``
 characters as delimiters::
@@ -60,3 +62,29 @@ characters as delimiters::
     SEARCH<TAB>REPLACE
 
 In this format, there must be only one ``<TAB>`` character per line.
+
+Patterns can contain escape characters:
+
+``\\``
+    Backslash (\)
+
+``\a``
+    ASCII bell (BEL)
+
+``\b``
+    Word boundary
+
+``\f``
+    ASCII formfeed (FF)
+
+``\n``
+    ASCII linefeed (LF)
+
+``\r``
+    Carriage Return (CR)
+
+``\t``
+    Horizontal Tab (TAB)
+
+``\v``
+    ASCII vertical tab (VT)
