@@ -72,6 +72,12 @@ Options:
 ``-v/--verbose``
     Turns on debugging output.
 
+Note: ``fsed`` runs even faster using PyPy_::
+
+    pypy -m fsed.fsed [OPTIONS] PATTERN_FILE [INPUT_FILE [INPUT_FILE2 ...]]
+
+.. _PyPy: http://pypy.org/
+
 Pattern File
 ============
 
