@@ -366,6 +366,11 @@ class AhoCorasickTrie(Trie):
             outstr += buffered
         return outstr
 
+
+# ============================================================
+#  WORD BOUNDARY DETECTION
+# ============================================================
+
 WHITESPACE_CHARS = ' \t\v\r\n'
 
 def boundary_transform(seq, force_edges = True):
