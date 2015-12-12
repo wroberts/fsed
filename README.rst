@@ -2,6 +2,23 @@
  fsed - Aho-Corasick string replacement utility
 ================================================
 
+.. image:: https://travis-ci.org/wroberts/fsed.svg?branch=master
+    :target: https://travis-ci.org/wroberts/fsed
+    :alt: Travis CI build status
+
+.. image:: https://coveralls.io/repos/wroberts/fsed/badge.svg
+    :target: https://coveralls.io/r/wroberts/fsed
+    :alt: Test code coverage
+
+.. image:: https://img.shields.io/pypi/v/fsed.svg
+    :target: https://pypi.python.org/pypi/fsed/
+    :alt: Latest Version
+
+Copyright (c) 2015 Will Roberts <wildwilhelm@gmail.com>
+
+Licensed under the MIT License (see file ``LICENSE.rst`` for
+details).
+
 Search and replace on file(s), with matching on fixed strings.
 
 Usage::
