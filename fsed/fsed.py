@@ -14,6 +14,13 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
 LOGGER = logging.getLogger(__name__)
 
 def set_log_level(verbose, quiet):
+    '''
+    Ses the logging level of the script based on command line options.
+
+    Arguments:
+    - `verbose`:
+    - `quiet`:
+    '''
     '''Sets the logging level.'''
     if quiet:
         verbose = -1
@@ -27,6 +34,16 @@ def set_log_level(verbose, quiet):
     fsed.ahocorasick.LOGGER.setLevel(verbose)
 
 def detect_pattern_format(pattern_filename, encoding, on_word_boundaries):
+    '''
+    Automatically detects the pattern file format, and determines
+    whether the Aho-Corasick string matching should pay attention to
+    word boundaries or not.
+
+    Arguments:
+    - `pattern_filename`:
+    - `encoding`:
+    - `on_word_boundaries`:
+    '''
     tsv = True
     boundaries = on_word_boundaries
     with open_file(pattern_filename) as input_file:
@@ -41,6 +58,12 @@ def detect_pattern_format(pattern_filename, encoding, on_word_boundaries):
     return tsv, boundaries
 
 def sub_escapes(sval):
+    '''
+    Process escaped characters in ``sval``.
+
+    Arguments:
+    - `sval`:
+    '''
     sval = sval.replace('\\a', '\a')
     sval = sval.replace('\\b', '\x00')
     sval = sval.replace('\\f', '\f')
@@ -52,6 +75,15 @@ def sub_escapes(sval):
     return sval
 
 def build_trie(pattern_filename, pattern_format, encoding, on_word_boundaries):
+    '''
+    Constructs a finite state machine for performing string rewriting.
+
+    Arguments:
+    - `pattern_filename`:
+    - `pattern_format`:
+    - `encoding`:
+    - `on_word_boundaries`:
+    '''
     boundaries = on_word_boundaries
     if pattern_format == 'auto' or not on_word_boundaries:
         tsv, boundaries = detect_pattern_format(pattern_filename, encoding,
