@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import, print_function, unicode_literals
-import fsed.utils import open_file
+from fsed.utils import open_file
 import click
 import fsed.ahocorasick
 import logging
@@ -27,8 +27,8 @@ def set_log_level(verbose, quiet):
 
 def build_trie(pattern_filename, pattern_format, on_word_boundaries):
     candidates = []
-    with open_file(batch_filename) as batch_file:
-        for line in batch_file:
+    with open_file(pattern_filename) as pattern_file:
+        for line in pattern_file:
             line = line.decode('utf-8').strip()
             candidates.append(line)
     LOGGER.info('{} patterns loaded'.format(len(candidates)))
@@ -74,7 +74,7 @@ def main(pattern_filename, input_filenames, pattern_format,
     set_log_level(verbose, quiet)
     if slow:
         by_line = True
-    # load the batch
+    # load the patterns
     LOGGER.info('fsed {} input {} output {}'.format(pattern_filename,
                                                     input_filenames,
                                                     output_filename))
