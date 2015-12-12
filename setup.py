@@ -65,7 +65,8 @@ setup(
         'Topic :: Software Development :: Pre-processors',
         'Topic :: Text Processing :: Filters',
         'Topic :: Text Processing :: Indexing',
-        'Topic :: Text Processing :: Linguistic'
+        'Topic :: Text Processing :: Linguistic',
+        'Topic :: Utilities',
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
