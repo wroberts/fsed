@@ -6,6 +6,7 @@ from fsed.utils import open_file
 import click
 import fsed.ahocorasick
 import logging
+import re
 import sys
 
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
@@ -25,30 +26,98 @@ def set_log_level(verbose, quiet):
     LOGGER.setLevel(verbose)
     fsed.ahocorasick.LOGGER.setLevel(verbose)
 
-def build_trie(pattern_filename, pattern_format, on_word_boundaries):
-    candidates = []
-    with open_file(pattern_filename) as pattern_file:
-        for line in pattern_file:
-            line = line.decode('utf-8').strip()
-            candidates.append(line)
-    LOGGER.info('{} patterns loaded'.format(len(candidates)))
+def detect_pattern_format(pattern_filename, encoding, on_word_boundaries):
+    tsv = True
+    boundaries = on_word_boundaries
+    with open_file(pattern_filename) as input_file:
+        for line in input_file:
+            line = line.decode(encoding)
+            if line.count('\t') != 1:
+                tsv = False
+            if '\\b' in line:
+                boundaries = True
+            if boundaries and not tsv:
+                break
+    return tsv, boundaries
+
+def sub_escapes(sval):
+    sval = sval.replace('\\a', '\a')
+    sval = sval.replace('\\b', '\x00')
+    sval = sval.replace('\\f', '\f')
+    sval = sval.replace('\\n', '\n')
+    sval = sval.replace('\\r', '\r')
+    sval = sval.replace('\\t', '\t')
+    sval = sval.replace('\\v', '\v')
+    sval = sval.replace('\\\\', '\\')
+    return sval
+
+def build_trie(pattern_filename, pattern_format, encoding, on_word_boundaries):
+    boundaries = on_word_boundaries
+    if pattern_format == 'auto' and not on_word_boundaries:
+        tsv, boundaries = detect_pattern_format(pattern_format, encoding,
+                                                on_word_boundaries)
+    if pattern_format == 'auto':
+        if tsv:
+            pattern_format = 'tsv'
+        else:
+            pattern_format = 'sed'
     trie = fsed.ahocorasick.AhoCorasickTrie()
-    for cand in candidates:
-        trie[cand] = cand.replace(' ', '_')
-    return trie
+    num_candidates = 0
+    with open_file(pattern_filename) as pattern_file:
+        for lineno, line in enumerate(pattern_file):
+            line = line.decode(encoding).rstrip('\n')
+            if not line.strip():
+                continue
+            # decode the line
+            if pattern_format == 'tsv':
+                fields = line.split('\t')
+                if len(fields) != 2:
+                    LOGGER.warning(('skipping line {} of pattern file (not '
+                                    'in tab-separated format): {}').format(lineno, line))
+                    continue
+                before, after = fields
+            elif pattern_format == 'sed':
+                before = after = None
+                line = line.lstrip()
+                if line[0] == 's':
+                    delim = line[1]
+                    fields = re.split(r'(?<!\\){}'.format(delim), line)
+                    if len(fields) == 4:
+                        before, after = fields[1], fields[2]
+                        before = re.sub(r'(?<!\\)\\{}'.format(delim), delim, before)
+                        after = re.sub(r'(?<!\\)\\{}'.format(delim), delim, after)
+                if before is None or after is None:
+                    LOGGER.warning(('skipping line {} of pattern file (not '
+                                    'in sed format): {}').format(lineno, line))
+                    continue
+            num_candidates += 1
+            if on_word_boundaries and before != before.strip():
+                LOGGER.warning(('before pattern on line {} padded whitespace; '
+                                'this may interact strangely with the --words '
+                                'option: {}').format(lineno, line))
+            before = sub_escapes(before)
+            after = sub_escapes(after)
+            if boundaries:
+                before = fsed.ahocorasick.boundary_transform(before, on_word_boundaries)
+            trie[before] = trie[after]
+    LOGGER.info('{} patterns loaded from {}'.format(num_candidates,
+                                                    pattern_filename))
+    return trie, boundaries
 
 @click.command()
 @click.argument('pattern_filename', type=click.Path(exists=True),
                 metavar='PATTERN_FILE')
 @click.argument('input_filenames', default='-', nargs=-1,
                 type=click.Path(exists=True), metavar='[INPUT_FILES]')
-@click.option('--pattern-format', type=click.Choice(['tsv', 'sed']),
-              default='sed', show_default=True,
+@click.option('--pattern-format', type=click.Choice(['auto', 'tsv', 'sed']),
+              default='auto', show_default=True,
               help='Specify the format of PATTERN_FILE')
 @click.option('-o', '--output', 'output_filename', type=click.Path(),
               help='Program output is written '
               'to this file. Default is to write '
               'to standard output.')
+@click.option('-e', '--encoding', default='utf-8', show_default=True,
+              help='The character encoding to use')
 @click.option('-w', '--words', is_flag=True,
               help='Match only on word boundaries: '
               'appends "\\b" to the beginning and '
@@ -66,7 +135,7 @@ def build_trie(pattern_filename, pattern_format, on_word_boundaries):
               help='Quiet operation, do not emit warnings.')
 def main(pattern_filename, input_filenames, pattern_format,
          output_filename,
-         words, by_line, slow, verbose, quiet):
+         encoding, words, by_line, slow, verbose, quiet):
     '''
     Search and replace on INPUT_FILE(s) (or standard input), with
     matching on fixed strings.
@@ -74,6 +143,7 @@ def main(pattern_filename, input_filenames, pattern_format,
     set_log_level(verbose, quiet)
     if slow:
         by_line = True
+    by_line = True # TODO: implement non-line-based rewriting
     # load the patterns
     LOGGER.info('fsed {} input {} output {}'.format(pattern_filename,
                                                     input_filenames,
@@ -83,20 +153,30 @@ def main(pattern_filename, input_filenames, pattern_format,
     if not output_filename:
         output_filename = '-'
     # build trie machine for matching
-    trie = build_trie(pattern_filename, pattern_format, words)
+    trie, boundaries = build_trie(pattern_filename, pattern_format, encoding, words)
+    LOGGER.info('writing to {}'.format(output_filename))
     with open_file(output_filename, 'w') as output_file:
         for input_filename in input_filenames:
             # search and replace
             with open_file(input_filename) as input_file:
-                LOGGER.info('writing {} to {}'.format(input_filename,
-                                                      output_filename))
-                num_lines = 0
-                for line in input_file:
-                    line = line.decode('utf-8').strip()
-                    line = trie.greedy_replace_w_sep(line)
-                    output_file.write((line + '\n').encode('utf-8'))
-                    num_lines += 1
-                LOGGER.info('{} lines written'.format(num_lines))
+                LOGGER.info('reading {}'.format(input_filename))
+                if by_line:
+                    num_lines = 0
+                    for line in input_file:
+                        line = line.decode(encoding).rstrip('\n')
+                        if boundaries:
+                            line = fsed.ahocorasick.boundary_transform(line)
+                        if slow:
+                            line = trie.replace(line)
+                        else:
+                            line = trie.greedy_replace(line)
+                        if boundaries:
+                            line = ''.join(fsed.ahocorasick.boundary_untransform(line))
+                        output_file.write((line + '\n').encode(encoding))
+                        num_lines += 1
+                    LOGGER.info('{} lines written'.format(num_lines))
+                else:
+                    raise NotImplementedError
 
 if __name__ == '__main__':
     main()
