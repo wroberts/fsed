@@ -409,7 +409,9 @@ class AhoCorasickTrie(Trie):
 def boundary_transform(seq):
     in_word = False
     for char in seq:
-        if char in ' \t\v\r\n':
+        if char == '\x00':
+            in_word = not in_word
+        elif char in ' \t\v\r\n':
             if in_word:
                 yield '\x00'
             in_word = False
