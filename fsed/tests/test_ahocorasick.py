@@ -253,7 +253,8 @@ class TestAhocorasick(unittest.TestCase):
         self.assertEqual(''.join(ahocorasick.boundary_transform('abc def')),
                          '\x00abc\x00 \x00def\x00')
         self.assertEqual(''.join(ahocorasick.boundary_transform('  abc def  ')),
-                         '  \x00abc\x00 \x00def\x00  ')
+                         '\x00  \x00abc\x00 \x00def\x00  \x00')
+
 
 if __name__ == '__main__':
     unittest.main()
