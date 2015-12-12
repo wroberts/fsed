@@ -125,4 +125,6 @@ setup(
             'fsed=fsed.fsed:main',
         ],
     },
+    test_suite='nose.collector',
+    tests_require=['nose'],
 )
