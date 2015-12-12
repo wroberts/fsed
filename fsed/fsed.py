@@ -53,8 +53,8 @@ def sub_escapes(sval):
 
 def build_trie(pattern_filename, pattern_format, encoding, on_word_boundaries):
     boundaries = on_word_boundaries
-    if pattern_format == 'auto' and not on_word_boundaries:
-        tsv, boundaries = detect_pattern_format(pattern_format, encoding,
+    if pattern_format == 'auto' or not on_word_boundaries:
+        tsv, boundaries = detect_pattern_format(pattern_filename, encoding,
                                                 on_word_boundaries)
     if pattern_format == 'auto':
         if tsv:
@@ -99,7 +99,7 @@ def build_trie(pattern_filename, pattern_format, encoding, on_word_boundaries):
             after = sub_escapes(after)
             if boundaries:
                 before = fsed.ahocorasick.boundary_transform(before, on_word_boundaries)
-            trie[before] = trie[after]
+            trie[before] = after
     LOGGER.info('{} patterns loaded from {}'.format(num_candidates,
                                                     pattern_filename))
     return trie, boundaries
