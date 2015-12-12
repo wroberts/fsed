@@ -235,68 +235,6 @@ class AhoCorasickTrie(Trie):
                 dict_suffix = dict_suffix.dict_suffix
                 yield (1 + pos - dict_suffix.depth, dict_suffix.depth, dict_suffix.value)
 
-    def greedy_replace_w_sep(self, seq):
-        if not self._suffix_links_set:
-            self._set_suffix_links()
-        current = self.root
-        retval = ''
-        buffered = ''
-        seq_len_l1 = len(seq) - 1
-        for pos, char in enumerate(seq):
-            while not char in current and current.has_suffix:
-                current = current.suffix
-            if char in current:
-                current = current[char]
-                buffered += char
-            else:
-                retval += buffered + char
-                buffered = ''
-            reduced = False
-            if current.has_value:
-                # scan back to find the char before current started
-                depth, value = current.depth, current.value
-                begin_pos = pos - depth
-                begin_boundary = begin_pos < 0 or seq[begin_pos] == ' '
-                end_boundary = pos == seq_len_l1 or seq[pos+1] == ' '
-                if begin_boundary and end_boundary:
-                    retval += buffered[:-depth] + value
-                    buffered = ''
-                    current = self.root
-                    reduced = True
-            if not reduced and current.has_dict_suffix:
-                # scan back to find the char before current started
-                depth, value = current.dict_suffix.depth, current.dict_suffix.value
-                begin_pos = pos - depth
-                begin_boundary = begin_pos < 0 or seq[begin_pos] == ' '
-                end_boundary = pos == seq_len_l1 or seq[pos+1] == ' '
-                if begin_boundary and end_boundary:
-                    retval += buffered[:-depth] + value
-                    buffered = ''
-                    current = self.root
-                    reduced = True
-        reduced = False
-        if current.has_value:
-            # scan back to find the char before current started
-            depth, value = current.depth, current.value
-            begin_pos = pos - depth
-            begin_boundary = begin_pos < 0 or seq[begin_pos] == ' '
-            end_boundary = pos == seq_len_l1 or seq[pos+1] == ' '
-            if begin_boundary and end_boundary:
-                retval += buffered[:-depth] + value
-                reduced = True
-        if not reduced and current.has_dict_suffix:
-            # scan back to find the char before current started
-            depth, value = current.dict_suffix.depth, current.dict_suffix.value
-            begin_pos = pos - depth
-            begin_boundary = begin_pos < 0 or seq[begin_pos] == ' '
-            end_boundary = pos == seq_len_l1 or seq[pos+1] == ' '
-            if begin_boundary and end_boundary:
-                retval += buffered[:-depth] + value
-                reduced = True
-        if not reduced:
-            retval += buffered
-        return retval
-
     def replace(self, seq):
         '''
         Performs search and replace on the given input string `seq` using
