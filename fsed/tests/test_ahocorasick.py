@@ -95,6 +95,7 @@ def debug3():
           caa (value = "(caa)") (suffix = "a") (dict_suffix = "a")
     [(0, 1, u'(a)'), (0, 2, u'(ab)'), (1, 2, u'(bc)'), (2, 1, u'(c)'), (3, 1, u'(c)'), (4, 1, u'(a)'), (4, 2, u'(ab)')]
     (a)(bc)(c)(ab)
+    (a)(bc)(c)(a)b
     '''
     t = ahocorasick.AhoCorasickTrie()
     t['a'] = '(a)'
@@ -108,6 +109,7 @@ def debug3():
     t.pretty_print()
     print(list(t.find_all('abccab')))
     print(t.replace('abccab'))
+    print(t.greedy_replace('abccab'))
 
 def debug4():
     '''
@@ -121,7 +123,9 @@ def debug4():
             xabc (value = "(xabc)") (suffix = "")
     [(0, 1, u'(x)'), (1, 2, u'(ab)'), (0, 4, u'(xabc)')]
     (xabc)
+    (x)(ab)c
     [(0, 1, u'(x)'), (1, 2, u'(ab)')]
+    (x)(ab)d
     (x)(ab)d
     '''
     t = ahocorasick.AhoCorasickTrie()
@@ -132,8 +136,10 @@ def debug4():
     t.pretty_print()
     print(list(t.find_all('xabc')))
     print(t.replace('xabc'))
+    print(t.greedy_replace('xabc'))
     print(list(t.find_all('xabd')))
     print(t.replace('xabd'))
+    print(t.greedy_replace('xabd'))
 
 def debug5():
     '''
@@ -147,6 +153,7 @@ def debug5():
               acabx (value = "(acabx)") (suffix = "")
     [(0, 2, u'(ac)'), (2, 2, u'(ab)')]
     (ac)(ab)y
+    (ac)(ab)y
     '''
     t = ahocorasick.AhoCorasickTrie()
     t['ac'] = '(ac)'
@@ -156,6 +163,7 @@ def debug5():
     t.pretty_print()
     print(list(t.find_all('acaby')))
     print(t.replace('acaby'))
+    print(t.greedy_replace('acaby'))
 
 def debug6():
     '''
