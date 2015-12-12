@@ -32,6 +32,8 @@ def set_log_level(verbose, quiet):
         verbose = -1
     if verbose < 0:
         verbose = logging.CRITICAL
+    elif verbose == 0:
+        verbose = logging.WARNING
     elif verbose == 1:
         verbose = logging.INFO
     elif 1 < verbose:
