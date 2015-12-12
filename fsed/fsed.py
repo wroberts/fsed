@@ -136,6 +136,26 @@ def build_trie(pattern_filename, pattern_format, encoding, on_word_boundaries):
                                                     pattern_filename))
     return trie, boundaries
 
+def rewrite_str_with_trie(sval, trie, boundaries = False, slow = False):
+    '''
+    Rewrites a string using the given trie object.
+
+    Arguments:
+    - `sval`:
+    - `trie`:
+    - `boundaries`:
+    - `slow`:
+    '''
+    if boundaries:
+        sval = fsed.ahocorasick.boundary_transform(sval)
+    if slow:
+        sval = trie.replace(sval)
+    else:
+        sval = trie.greedy_replace(sval)
+    if boundaries:
+        sval = ''.join(fsed.ahocorasick.boundary_untransform(sval))
+    return sval
+
 @click.command()
 @click.argument('pattern_filename', type=click.Path(exists=True),
                 metavar='PATTERN_FILE')
@@ -196,14 +216,7 @@ def main(pattern_filename, input_filenames, pattern_format,
                     num_lines = 0
                     for line in input_file:
                         line = line.decode(encoding).rstrip('\n')
-                        if boundaries:
-                            line = fsed.ahocorasick.boundary_transform(line)
-                        if slow:
-                            line = trie.replace(line)
-                        else:
-                            line = trie.greedy_replace(line)
-                        if boundaries:
-                            line = ''.join(fsed.ahocorasick.boundary_untransform(line))
+                        line = rewrite_str_with_trie(sval, trie, boundaries, slow)
                         output_file.write((line + '\n').encode(encoding))
                         num_lines += 1
                     LOGGER.info('{} lines written'.format(num_lines))
