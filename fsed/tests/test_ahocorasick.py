@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''
+test_ahocorasick.py
+(c) Will Roberts  12 December, 2015
+
+Unit tests for the ``ahocorasick`` module.
+'''
+
+
 from __future__ import absolute_import, print_function, unicode_literals
 from .. import ahocorasick
 import doctest
-import re
 import unittest
 
 def debug1():
