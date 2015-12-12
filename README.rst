@@ -21,7 +21,20 @@ details).
 
 Search and replace on file(s), with matching on fixed strings.
 
-Usage::
+Install
+=======
+
+``fsed`` is written in Python_; you can install it with pip_::
+
+    pip install fsed
+
+.. _Python: http://www.python.org/
+.. _pip: https://en.wikipedia.org/wiki/Pip_(package_manager)
+
+Usage
+=====
+
+::
 
     fsed [OPTIONS] PATTERN_FILE [INPUT_FILE [INPUT_FILE2 ...]]
 
