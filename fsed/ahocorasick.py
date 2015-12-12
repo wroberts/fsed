@@ -406,22 +406,47 @@ class AhoCorasickTrie(Trie):
             outstr += buffered
         return outstr
 
-def boundary_transform(seq):
-    in_word = False
+WHITESPACE_CHARS = ' \t\v\r\n'
+
+def boundary_transform(seq, force_edges = True):
+    gen = boundary_words(seq)
+    if force_edges:
+        gen = boundary_edges(gen)
+    gen = remove_duplicates(gen)
+    for char in gen:
+        yield char
+
+def boundary_words(seq):
+    in_word = None
     for char in seq:
-        if char == '\x00':
+        if char == '\x00' and in_word is not None:
             in_word = not in_word
-        elif char in ' \t\v\r\n':
-            if in_word:
+        elif char in WHITESPACE_CHARS:
+            if in_word is not None and in_word:
                 yield '\x00'
             in_word = False
         else:
-            if not in_word:
+            if in_word is not None and not in_word:
                 yield '\x00'
             in_word = True
         yield char
-    if in_word:
-        yield '\x00'
+
+def boundary_edges(seq):
+    yield '\x00'
+    for char in seq:
+        yield char
+    yield '\x00'
+
+def remove_duplicates(seq):
+    last_boundary = False
+    for char in seq:
+        if char == '\x00':
+            if not last_boundary:
+                last_boundary = True
+                yield char
+        else:
+            last_boundary = False
+            yield char
 
 def boundary_untransform(seq):
     for char in seq:
