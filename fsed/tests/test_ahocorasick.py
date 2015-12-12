@@ -255,6 +255,27 @@ class TestAhocorasick(unittest.TestCase):
         self.assertEqual(''.join(ahocorasick.boundary_transform('  abc def  ')),
                          '\x00  \x00abc\x00 \x00def\x00  \x00')
 
+    def test_boundary_transform_2(self):
+        '''
+        Test the boundary_transform.
+        '''
+        self.assertEqual(''.join(ahocorasick.boundary_transform('abc def')),
+                         '\x00abc\x00 \x00def\x00')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('\x00abc def')),
+                         '\x00abc\x00 \x00def\x00')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('abc def\x00')),
+                         '\x00abc\x00 \x00def\x00')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('\x00abc def\x00')),
+                         '\x00abc\x00 \x00def\x00')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('abc def', False)),
+                         'abc\x00 \x00def')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('\x00abc def', False)),
+                         '\x00abc\x00 \x00def')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('abc def\x00', False)),
+                         'abc\x00 \x00def\x00')
+        self.assertEqual(''.join(ahocorasick.boundary_transform('\x00abc def\x00', False)),
+                         '\x00abc\x00 \x00def\x00')
+
 
 if __name__ == '__main__':
     unittest.main()
