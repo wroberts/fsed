@@ -98,10 +98,10 @@ class Trie(object):
         current = self.root
         for char in seq:
             if char not in current:
-                raise KeyError(seq)
+                raise KeyError(current.prefix + char)
             current = current[char]
         if not current.has_value:
-            raise KeyError(seq)
+            raise KeyError(current.prefix)
         return current.value
 
     def __setitem__(self, seq, value):
