@@ -121,6 +121,10 @@ def build_trie(pattern_filename, pattern_format, encoding, on_word_boundaries):
                 line = line.lstrip()
                 if line[0] == 's':
                     delim = line[1]
+                    # delim might be a regex special character;
+                    # escape it if necessary
+                    if delim in '.^$*+?[](){}|\\':
+                        delim = '\\' + delim
                     fields = re.split(r'(?<!\\){}'.format(delim), line)
                     if len(fields) == 4:
                         before, after = fields[1], fields[2]
