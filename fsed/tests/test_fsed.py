@@ -9,6 +9,7 @@ Test the ``fsed`` module.
 '''
 
 from __future__ import absolute_import, print_function, unicode_literals
+from .. import ahocorasick
 from .. import fsed
 try:
     from StringIO import StringIO
@@ -111,6 +112,23 @@ class TestFsed(unittest.TestCase):
         self.assertEqual(fsed.rewrite_str_with_trie(INPUT_TEXT, trie, boundaries),
                          WITH_WORDS_OUTPUT)
 
+    def test_slow(self):
+        '''
+        Tests the fsed.rewrite_str_with_trie function with the ``slow``
+        flag on.
+        '''
+        trie = ahocorasick.AhoCorasickTrie()
+        trie['a'] = '(a)'
+        trie['ab'] = '(ab)'
+        trie['bab'] = '(bab)'
+        trie['bc'] = '(bc)'
+        trie['bca'] = '(bca)'
+        trie['c'] = '(c)'
+        trie['caa'] = '(caa)'
+        self.assertEqual(fsed.rewrite_str_with_trie('abccab', trie, slow=False),
+                         '(a)(bc)(c)(a)b')
+        self.assertEqual(fsed.rewrite_str_with_trie('abccab', trie, slow=True),
+                         '(a)(bc)(c)(ab)')
 
 if __name__ == '__main__':
     unittest.main()
