@@ -122,10 +122,11 @@ class Trie(object):
             current = current[char]
         current.value = value
 
-    def pretty_print(self):
+    def pretty_print_str(self):
         '''
-        Prints this trie's structure to standard output for debugging.
+        Create a string to pretty-print this trie to standard output.
         '''
+        retval = ''
         # dfs
         todo = [self.root]
         while todo:
@@ -133,8 +134,14 @@ class Trie(object):
             for char in reversed(sorted(current.keys())):
                 todo.append(current[char])
             indent = ' ' * (current.depth * 2)
-            print(indent + current.__unicode__())
+            retval += indent + current.__unicode__() + '\n'
+        return retval.rstrip('\n')
 
+    def pretty_print(self):
+        '''
+        Prints this trie's structure to standard output for debugging.
+        '''
+        print(self.pretty_print_str())
 
 # ============================================================
 #  AHO-CORASICK TRIE
