@@ -35,6 +35,11 @@ Kublai Khan\tKublai_Khan
 Christopher Columbus\tChristopher_Columbus
 and uncle\tand_uncle'''
 
+PATTERN_SED = b'''s/\\bMarco Polo/Marco_Polo/
+s/Kublai Khan/Kublai_Khan/
+s.Christopher Columbus.Christopher_Columbus.
+s/and uncle/and_uncle/'''
+
 INPUT_TEXT = '''and uncle
 sand uncle
 s and uncle
@@ -73,8 +78,11 @@ class TestFsed(unittest.TestCase):
         pattern_file = CMStringIO(PATTERN_TSV)
         self.assertEqual(fsed.detect_pattern_format(pattern_file, 'utf-8', False),
                          (True, True))
+        pattern_file = CMStringIO(PATTERN_SED)
+        self.assertEqual(fsed.detect_pattern_format(pattern_file, 'utf-8', False),
+                         (False, True))
 
-    def test_rewriting(self):
+    def test_rewriting_tsv(self):
         '''
         Tests the fsed.rewrite_str_with_trie function.
         '''
@@ -84,6 +92,21 @@ class TestFsed(unittest.TestCase):
         self.assertEqual(fsed.rewrite_str_with_trie(INPUT_TEXT, trie, boundaries),
                          WITHOUT_WORDS_OUTPUT)
         trie, boundaries = fsed.build_trie(pattern_file, 'tsv', 'utf-8', True)
+        self.assertTrue(boundaries)
+        self.assertEqual(fsed.rewrite_str_with_trie(INPUT_TEXT, trie, boundaries),
+                         WITH_WORDS_OUTPUT)
+
+    def test_rewriting_sed(self):
+        '''
+        Tests the fsed.rewrite_str_with_trie function.
+        '''
+        pattern_file = CMStringIO(PATTERN_SED)
+        trie, boundaries = fsed.build_trie(pattern_file, 'sed', 'utf-8', False)
+        self.assertTrue('C' in trie.root)
+        self.assertTrue(boundaries)
+        self.assertEqual(fsed.rewrite_str_with_trie(INPUT_TEXT, trie, boundaries),
+                         WITHOUT_WORDS_OUTPUT)
+        trie, boundaries = fsed.build_trie(pattern_file, 'sed', 'utf-8', True)
         self.assertTrue(boundaries)
         self.assertEqual(fsed.rewrite_str_with_trie(INPUT_TEXT, trie, boundaries),
                          WITH_WORDS_OUTPUT)
