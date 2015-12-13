@@ -6,8 +6,8 @@
     :target: https://travis-ci.org/wroberts/fsed
     :alt: Travis CI build status
 
-.. image:: https://coveralls.io/repos/wroberts/fsed/badge.svg
-    :target: https://coveralls.io/r/wroberts/fsed
+.. image:: https://coveralls.io/repos/wroberts/fsed/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/wroberts/fsed?branch=master
     :alt: Test code coverage
 
 .. image:: https://img.shields.io/pypi/v/fsed.svg
