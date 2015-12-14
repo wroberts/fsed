@@ -1,3 +1,7 @@
 include LICENSE.rst
 include README.rst
 include fsed/VERSION
+include fsed/tests/*.gz
+include fsed/tests/README.rst
+include fsed/tests/fsed-testpats.utf8.pl
+include fsed/tests/fsed-testpats.wb.bsd.utf8.sed
