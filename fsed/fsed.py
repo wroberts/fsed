@@ -39,7 +39,6 @@ def set_log_level(verbose, quiet):
     elif 1 < verbose:
         verbose = logging.DEBUG
     LOGGER.setLevel(verbose)
-    fsed.ahocorasick.LOGGER.setLevel(verbose)
 
 def detect_pattern_format(pattern_filename, encoding, on_word_boundaries):
     '''

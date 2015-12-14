@@ -10,12 +10,6 @@ Second attempt writing Aho-Corasick string matching in Python.
 
 from __future__ import absolute_import, print_function, unicode_literals
 from collections import deque
-import sys
-import logging
-
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                    stream=sys.stderr, level=logging.INFO)
-LOGGER = logging.getLogger(__name__)
 
 
 # ============================================================
