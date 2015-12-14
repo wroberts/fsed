@@ -153,7 +153,7 @@ def warn_prefix_values(trie):
     Prints warning messages for every node that has both a value and a
     longest_prefix.
     '''
-    for current, parent in trie.dfs():
+    for current, _parent in trie.dfs():
         if current.has_value and current.longest_prefix is not None:
             LOGGER.warn(('pattern {} (value {}) is a superstring of pattern '
                          '{} (value {}) and will never be matched').format(
