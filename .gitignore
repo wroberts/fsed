@@ -1,5 +1,6 @@
 *.pyc
 *~
 /.coverage
+/.ropeproject/
 /cover/
 /fsed.egg-info/
