@@ -148,6 +148,18 @@ def build_trie(pattern_filename, pattern_format, encoding, on_word_boundaries):
                                                     pattern_filename))
     return trie, boundaries
 
+def warn_prefix_values(trie):
+    '''
+    Prints warning messages for every node that has both a value and a
+    longest_prefix.
+    '''
+    for current, parent in trie.dfs():
+        if current.has_value and current.longest_prefix is not None:
+            LOGGER.warn(('pattern {} (value {}) is a superstring of pattern '
+                         '{} (value {}) and will never be matched').format(
+                             current.prefix, current.value,
+                             current.longest_prefix.prefix, current.longest_prefix.value))
+
 def rewrite_str_with_trie(sval, trie, boundaries = False, slow = False):
     '''
     Rewrites a string using the given trie object.
@@ -218,6 +230,8 @@ def main(pattern_filename, input_filenames, pattern_format,
         output_filename = '-'
     # build trie machine for matching
     trie, boundaries = build_trie(pattern_filename, pattern_format, encoding, words)
+    if not slow:
+        warn_prefix_values(trie)
     LOGGER.info('writing to {}'.format(output_filename))
     with open_file(output_filename, 'w') as output_file:
         for input_filename in input_filenames:
