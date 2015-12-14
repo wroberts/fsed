@@ -95,6 +95,18 @@ class TestAhocorasick(unittest.TestCase):
         trie['dog'] = '(dog)'
         trie['cat'] = '(cat)'
         trie['cablex'] = '(cablex)'
+        self.assertTrue('damn' in trie)
+        self.assertTrue('dog' in trie)
+        self.assertTrue('cat' in trie)
+        self.assertTrue('cablex' in trie)
+        self.assertEqual(trie['damn'], '(damn)')
+        self.assertEqual(trie['dog'], '(dog)')
+        self.assertEqual(trie['cat'], '(cat)')
+        self.assertEqual(trie['cablex'], '(cablex)')
+        self.assertFalse('d' in trie)
+        self.assertFalse('cable' in trie)
+        self.assertRaises(KeyError, trie.__getitem__, ('d',))
+        self.assertRaises(KeyError, trie.__getitem__, ('cablex',))
         trie._set_suffix_links()
         debug_2_ppstr1 = '''<ROOT>
   c (suffix = "")
