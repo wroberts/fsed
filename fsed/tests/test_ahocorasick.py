@@ -104,6 +104,7 @@ class TestAhocorasick(unittest.TestCase):
         self.assertEqual(trie['cat'], '(cat)')
         self.assertEqual(trie['cablex'], '(cablex)')
         self.assertFalse('d' in trie)
+        self.assertFalse('cabbie' in trie)
         self.assertFalse('cable' in trie)
         self.assertRaises(KeyError, trie.__getitem__, ('d',))
         self.assertRaises(KeyError, trie.__getitem__, ('cablex',))
@@ -144,6 +145,8 @@ class TestAhocorasick(unittest.TestCase):
       ogr (suffix = "")
         ogre (value = "(ogre)") (suffix = "")'''
         self.assertEqual(trie.pretty_print_str(), debug_2_ppstr2)
+        self.assertEqual(trie.greedy_replace('dogre'), '(dog)re')
+        self.assertEqual(trie.greedy_replace('doogre'), 'do(ogre)')
 
     def test_debug3(self):
         '''
@@ -179,6 +182,8 @@ class TestAhocorasick(unittest.TestCase):
                           (4, 2, '(ab)')])
         self.assertEqual(trie.replace('abccab'),
                          '(a)(bc)(c)(ab)')
+        self.assertEqual(trie.greedy_replace('ba'), 'b(a)')
+        self.assertEqual(trie.greedy_replace('bab'), '(bab)')
         self.assertEqual(trie.greedy_replace('abccab'),
                          '(a)(bc)(c)(a)b')
 
@@ -233,6 +238,43 @@ class TestAhocorasick(unittest.TestCase):
                          '(ac)(ab)y')
         self.assertEqual(trie.greedy_replace('acaby'),
                          '(ac)(ab)y')
+
+    def test_debug6(self):
+        '''
+        Test case from Wikipedia.
+
+        https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
+        '''
+        trie = ahocorasick.AhoCorasickTrie()
+        trie['ab'] = '(ab)'
+        trie['bab'] = '(bab)'
+        trie['bc'] = '(bc)'
+        trie['bca'] = '(bca)'
+        trie['c'] = '(c)'
+        trie['caa'] = '(caa)'
+        trie._set_suffix_links()
+        debug_6_ppstr = '''<ROOT>
+  a (suffix = "")
+    ab (value = "(ab)") (suffix = "b")
+  b (suffix = "")
+    ba (suffix = "a")
+      bab (value = "(bab)") (suffix = "ab") (dict_suffix = "ab")
+    bc (value = "(bc)") (suffix = "c") (dict_suffix = "c")
+      bca (value = "(bca)") (suffix = "ca")
+  c (value = "(c)") (suffix = "")
+    ca (suffix = "a")
+      caa (value = "(caa)") (suffix = "a")'''
+        self.assertEqual(trie.pretty_print_str(),
+                         debug_6_ppstr)
+        self.assertEqual(list(trie.find_all('abccab')),
+                         [(0, 2, '(ab)'), (1, 2, '(bc)'), (2, 1, '(c)'),
+                          (3, 1, '(c)'), (4, 2, '(ab)')])
+        self.assertEqual(trie.replace('abccab'),
+                         '(ab)(c)(c)(ab)')
+        self.assertEqual(trie.greedy_replace('ba'), 'ba')
+        self.assertEqual(trie.greedy_replace('bab'), '(bab)')
+        self.assertEqual(trie.greedy_replace('abccab'),
+                         '(ab)(c)(c)(ab)')
 
     def test_debug7(self):
         '''Hand-written test case.'''
