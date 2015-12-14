@@ -49,6 +49,18 @@ class TestAhocorasick(unittest.TestCase):
         self.assertEqual(''.join(ahocorasick.boundary_transform('\x00abc def\x00', False)),
                          '\x00abc\x00 \x00def\x00')
 
+    def test_transform_roundtrip(self):
+        '''
+        Test boundary_transform round trip.
+        '''
+        test_strings = ['', 'abc', 'abc def', '  abc def', '  abc def  ', 'abc def  ',]
+        for force_edges in [False, True]:
+            for test_string in test_strings:
+                self.assertEqual(test_string,
+                                 ''.join(ahocorasick.boundary_untransform(
+                                     ahocorasick.boundary_transform(test_string,
+                                                                    force_edges))))
+
     def test_debug1(self):
         t = ahocorasick.Trie()
         t['a'] = '(a)'
