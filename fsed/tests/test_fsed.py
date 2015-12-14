@@ -39,7 +39,8 @@ class CMStringIO(StringIO):
         pass
 
 def click_command_runner(cli, args=None):
-    tempfile_path = tempfile.mkstemp()[1]
+    fhandle, tempfile_path = tempfile.mkstemp()
+    os.close(fhandle)
     if args:
         args = [(tempfile_path if x == '%t' else x) for x in args]
     exit_code = output = result = None
