@@ -67,14 +67,14 @@ class TestAhocorasick(unittest.TestCase):
 
         https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
         '''
-        t = ahocorasick.Trie()
-        t['a'] = '(a)'
-        t['ab'] = '(ab)'
-        t['bab'] = '(bab)'
-        t['bc'] = '(bc)'
-        t['bca'] = '(bca)'
-        t['c'] = '(c)'
-        t['caa'] = '(caa)'
+        trie = ahocorasick.Trie()
+        trie['a'] = '(a)'
+        trie['ab'] = '(ab)'
+        trie['bab'] = '(bab)'
+        trie['bc'] = '(bc)'
+        trie['bca'] = '(bca)'
+        trie['c'] = '(c)'
+        trie['caa'] = '(caa)'
         debug_1_ppstr = '''<ROOT>
   a (value = "(a)")
     ab (value = "(ab)")
@@ -86,16 +86,16 @@ class TestAhocorasick(unittest.TestCase):
   c (value = "(c)")
     ca
       caa (value = "(caa)")'''
-        self.assertEqual(t.pretty_print_str(), debug_1_ppstr)
+        self.assertEqual(trie.pretty_print_str(), debug_1_ppstr)
 
     def test_debug2(self):
         '''Hand-written test case.'''
-        t = ahocorasick.AhoCorasickTrie()
-        t['damn'] = '(damn)'
-        t['dog'] = '(dog)'
-        t['cat'] = '(cat)'
-        t['cablex'] = '(cablex)'
-        t._set_suffix_links()
+        trie = ahocorasick.AhoCorasickTrie()
+        trie['damn'] = '(damn)'
+        trie['dog'] = '(dog)'
+        trie['cat'] = '(cat)'
+        trie['cablex'] = '(cablex)'
+        trie._set_suffix_links()
         debug_2_ppstr1 = '''<ROOT>
   c (suffix = "")
     ca (suffix = "")
@@ -110,9 +110,9 @@ class TestAhocorasick(unittest.TestCase):
         damn (value = "(damn)") (suffix = "")
     do (suffix = "")
       dog (value = "(dog)") (suffix = "")'''
-        self.assertEqual(t.pretty_print_str(), debug_2_ppstr1)
-        t['ogre'] = '(ogre)'
-        t._set_suffix_links()
+        self.assertEqual(trie.pretty_print_str(), debug_2_ppstr1)
+        trie['ogre'] = '(ogre)'
+        trie._set_suffix_links()
         debug_2_ppstr2 = '''<ROOT>
   c (suffix = "")
     ca (suffix = "")
@@ -131,7 +131,7 @@ class TestAhocorasick(unittest.TestCase):
     og (suffix = "")
       ogr (suffix = "")
         ogre (value = "(ogre)") (suffix = "")'''
-        self.assertEqual(t.pretty_print_str(), debug_2_ppstr2)
+        self.assertEqual(trie.pretty_print_str(), debug_2_ppstr2)
 
     def test_debug3(self):
         '''
@@ -139,15 +139,15 @@ class TestAhocorasick(unittest.TestCase):
 
         https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
         '''
-        t = ahocorasick.AhoCorasickTrie()
-        t['a'] = '(a)'
-        t['ab'] = '(ab)'
-        t['bab'] = '(bab)'
-        t['bc'] = '(bc)'
-        t['bca'] = '(bca)'
-        t['c'] = '(c)'
-        t['caa'] = '(caa)'
-        t._set_suffix_links()
+        trie = ahocorasick.AhoCorasickTrie()
+        trie['a'] = '(a)'
+        trie['ab'] = '(ab)'
+        trie['bab'] = '(bab)'
+        trie['bc'] = '(bc)'
+        trie['bca'] = '(bca)'
+        trie['c'] = '(c)'
+        trie['caa'] = '(caa)'
+        trie._set_suffix_links()
         debug_3_ppstr = '''<ROOT>
   a (value = "(a)") (suffix = "")
     ab (value = "(ab)") (suffix = "b")
@@ -159,24 +159,24 @@ class TestAhocorasick(unittest.TestCase):
   c (value = "(c)") (suffix = "")
     ca (suffix = "a") (dict_suffix = "a")
       caa (value = "(caa)") (suffix = "a") (dict_suffix = "a")'''
-        self.assertEqual(t.pretty_print_str(),
+        self.assertEqual(trie.pretty_print_str(),
                          debug_3_ppstr)
-        self.assertEqual(list(t.find_all('abccab')),
+        self.assertEqual(list(trie.find_all('abccab')),
                          [(0, 1, '(a)'), (0, 2, '(ab)'), (1, 2, '(bc)'),
                           (2, 1, '(c)'), (3, 1, '(c)'), (4, 1, '(a)'),
                           (4, 2, '(ab)')])
-        self.assertEqual(t.replace('abccab'),
+        self.assertEqual(trie.replace('abccab'),
                          '(a)(bc)(c)(ab)')
-        self.assertEqual(t.greedy_replace('abccab'),
+        self.assertEqual(trie.greedy_replace('abccab'),
                          '(a)(bc)(c)(a)b')
 
     def test_debug4(self):
         '''Hand-written test case.'''
-        t = ahocorasick.AhoCorasickTrie()
-        t['x'] = '(x)'
-        t['xabc'] = '(xabc)'
-        t['ab'] = '(ab)'
-        t._set_suffix_links()
+        trie = ahocorasick.AhoCorasickTrie()
+        trie['x'] = '(x)'
+        trie['xabc'] = '(xabc)'
+        trie['ab'] = '(ab)'
+        trie._set_suffix_links()
         debug_4_ppstr = '''<ROOT>
   a (suffix = "")
     ab (value = "(ab)") (suffix = "")
@@ -184,28 +184,28 @@ class TestAhocorasick(unittest.TestCase):
     xa (suffix = "a")
       xab (suffix = "ab") (dict_suffix = "ab")
         xabc (value = "(xabc)") (suffix = "")'''
-        self.assertEqual(t.pretty_print_str(),
+        self.assertEqual(trie.pretty_print_str(),
                          debug_4_ppstr)
-        self.assertEqual(list(t.find_all('xabc')),
+        self.assertEqual(list(trie.find_all('xabc')),
                          [(0, 1, '(x)'), (1, 2, '(ab)'), (0, 4, '(xabc)')])
-        self.assertEqual(t.replace('xabc'),
+        self.assertEqual(trie.replace('xabc'),
                          '(xabc)')
-        self.assertEqual(t.greedy_replace('xabc'),
+        self.assertEqual(trie.greedy_replace('xabc'),
                          '(x)(ab)c')
-        self.assertEqual(list(t.find_all('xabd')),
+        self.assertEqual(list(trie.find_all('xabd')),
                          [(0, 1, '(x)'), (1, 2, '(ab)')])
-        self.assertEqual(t.replace('xabd'),
+        self.assertEqual(trie.replace('xabd'),
                          '(x)(ab)d')
-        self.assertEqual(t.greedy_replace('xabd'),
+        self.assertEqual(trie.greedy_replace('xabd'),
                          '(x)(ab)d')
 
     def test_debug5(self):
         '''Hand-written test case.'''
-        t = ahocorasick.AhoCorasickTrie()
-        t['ac'] = '(ac)'
-        t['acabx'] = '(acabx)'
-        t['ab'] = '(ab)'
-        t._set_suffix_links()
+        trie = ahocorasick.AhoCorasickTrie()
+        trie['ac'] = '(ac)'
+        trie['acabx'] = '(acabx)'
+        trie['ab'] = '(ab)'
+        trie._set_suffix_links()
         debug_5_ppstr = '''<ROOT>
   a (suffix = "")
     ab (value = "(ab)") (suffix = "")
@@ -213,23 +213,23 @@ class TestAhocorasick(unittest.TestCase):
       aca (suffix = "a")
         acab (suffix = "ab") (dict_suffix = "ab")
           acabx (value = "(acabx)") (suffix = "")'''
-        self.assertEqual(t.pretty_print_str(),
+        self.assertEqual(trie.pretty_print_str(),
                          debug_5_ppstr)
-        self.assertEqual(list(t.find_all('acaby')),
+        self.assertEqual(list(trie.find_all('acaby')),
                          [(0, 2, '(ac)'), (2, 2, '(ab)')])
-        self.assertEqual(t.replace('acaby'),
+        self.assertEqual(trie.replace('acaby'),
                          '(ac)(ab)y')
-        self.assertEqual(t.greedy_replace('acaby'),
+        self.assertEqual(trie.greedy_replace('acaby'),
                          '(ac)(ab)y')
 
     def test_debug7(self):
         '''Hand-written test case.'''
-        t = ahocorasick.AhoCorasickTrie()
-        t['r 3'] = 'r_3'
-        t['Rather he'] = 'Rather_he'
-        t['er Rabbit'] = 'er_Rabbit'
-        t['a Merry'] = 'a_Merry'
-        t._set_suffix_links()
+        trie = ahocorasick.AhoCorasickTrie()
+        trie['r 3'] = 'r_3'
+        trie['Rather he'] = 'Rather_he'
+        trie['er Rabbit'] = 'er_Rabbit'
+        trie['a Merry'] = 'a_Merry'
+        trie._set_suffix_links()
         debug_7_ppstr = '''<ROOT>
   R (suffix = "")
     Ra (suffix = "a")
@@ -259,21 +259,21 @@ class TestAhocorasick(unittest.TestCase):
   r (suffix = "")
     r  (suffix = "")
       r 3 (value = "r_3") (suffix = "")'''
-        self.assertEqual(t.pretty_print_str(), debug_7_ppstr)
+        self.assertEqual(trie.pretty_print_str(), debug_7_ppstr)
 
     def test_debug8(self):
         '''Hand-written test case.'''
-        t = ahocorasick.AhoCorasickTrie()
-        t['cart'] = '(cart)'
-        t['cat'] = '(cat)'
-        self.assertEqual(t.greedy_replace('carry cat cat carcat cart car'),
+        trie = ahocorasick.AhoCorasickTrie()
+        trie['cart'] = '(cart)'
+        trie['cat'] = '(cat)'
+        self.assertEqual(trie.greedy_replace('carry cat cat carcat cart car'),
                          'carry (cat) (cat) car(cat) (cart) car')
-        t = ahocorasick.AhoCorasickTrie()
-        t[ahocorasick.boundary_transform('dog')] = '(dog)'
-        t[ahocorasick.boundary_transform('ca')] = '(ca)'
-        t[ahocorasick.boundary_transform('cat')] = '(cat)'
+        trie = ahocorasick.AhoCorasickTrie()
+        trie[ahocorasick.boundary_transform('dog')] = '(dog)'
+        trie[ahocorasick.boundary_transform('ca')] = '(ca)'
+        trie[ahocorasick.boundary_transform('cat')] = '(cat)'
         self.assertEqual(''.join(ahocorasick.boundary_untransform(
-            t.greedy_replace(ahocorasick.boundary_transform('my dog is a ca catty cat cat')))),
+            trie.greedy_replace(ahocorasick.boundary_transform('my dog is a ca catty cat cat')))),
                          'my (dog) is a (ca) catty (cat) (cat)')
 
 
