@@ -272,6 +272,7 @@ class TestAhocorasick(unittest.TestCase):
                          '(ab)(c)(c)(ab)')
         self.assertEqual(trie.greedy_replace('ba'), 'ba')
         self.assertEqual(trie.greedy_replace('bc'), 'b(c)')
+        self.assertEqual(trie.greedy_replace('bcb'), 'b(c)b')
         self.assertEqual(trie.greedy_replace('bab'), '(bab)')
         self.assertEqual(trie.greedy_replace('abccab'),
                          '(ab)(c)(c)(ab)')
