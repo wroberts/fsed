@@ -248,7 +248,6 @@ class TestAhocorasick(unittest.TestCase):
         trie = ahocorasick.AhoCorasickTrie()
         trie['ab'] = '(ab)'
         trie['bab'] = '(bab)'
-        trie['bc'] = '(bc)'
         trie['bca'] = '(bca)'
         trie['c'] = '(c)'
         trie['caa'] = '(caa)'
@@ -259,7 +258,7 @@ class TestAhocorasick(unittest.TestCase):
   b (suffix = "")
     ba (suffix = "a")
       bab (value = "(bab)") (suffix = "ab") (dict_suffix = "ab")
-    bc (value = "(bc)") (suffix = "c") (dict_suffix = "c")
+    bc (suffix = "c") (dict_suffix = "c")
       bca (value = "(bca)") (suffix = "ca")
   c (value = "(c)") (suffix = "")
     ca (suffix = "a")
@@ -267,11 +266,12 @@ class TestAhocorasick(unittest.TestCase):
         self.assertEqual(trie.pretty_print_str(),
                          debug_6_ppstr)
         self.assertEqual(list(trie.find_all('abccab')),
-                         [(0, 2, '(ab)'), (1, 2, '(bc)'), (2, 1, '(c)'),
+                         [(0, 2, '(ab)'), (2, 1, '(c)'),
                           (3, 1, '(c)'), (4, 2, '(ab)')])
         self.assertEqual(trie.replace('abccab'),
                          '(ab)(c)(c)(ab)')
         self.assertEqual(trie.greedy_replace('ba'), 'ba')
+        self.assertEqual(trie.greedy_replace('bc'), 'b(c)')
         self.assertEqual(trie.greedy_replace('bab'), '(bab)')
         self.assertEqual(trie.greedy_replace('abccab'),
                          '(ab)(c)(c)(ab)')
