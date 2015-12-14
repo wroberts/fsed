@@ -48,7 +48,8 @@ def click_command_runner(cli, args=None):
         result = runner.invoke(cli, args)
         exit_code = result.exit_code
         output = result.output
-        result = open(tempfile_path).read()
+        with open(tempfile_path) as input_file:
+            result = input_file.read()
     finally:
         # NOTE: To retain the tempfile if the test fails, remove
         # the try-finally clause.
