@@ -126,6 +126,32 @@ class Trie(object):
             current = current[char]
         current.value = value
 
+    def dfs(self):
+        '''
+        Depth-first search generator.  Yields `(node, parent)` for every
+        node in the tree, beginning with `(self.root, None)`.
+        '''
+        yield (self.root, None)
+        todo = [(self.root[char], self.root) for char in self.root]
+        while todo:
+            current, parent = todo.pop()
+            yield (current, parent)
+            for char in current:
+                todo.append((current[char], current))
+
+    def bfs(self):
+        '''
+        Breadth-first search generator.  Yields `(node, parent)` for every
+        node in the tree, beginning with `(self.root, None)`.
+        '''
+        yield (self.root, None)
+        todo = deque([(self.root[char], self.root) for char in self.root])
+        while todo:
+            current, parent = todo.popleft()
+            yield (current, parent)
+            for char in current:
+                todo.append((current[char], current))
+
     def pretty_print_str(self):
         '''
         Create a string to pretty-print this trie to standard output.
@@ -169,12 +195,7 @@ class AhoCorasickTrie(Trie):
         Reset all suffix links in all nodes in this trie.
         '''
         self._suffix_links_set = False
-        # dfs
-        todo = [self.root]
-        while todo:
-            current = todo.pop()
-            for char in current:
-                todo.append(current[char])
+        for current, _parent in self.dfs():
             current.suffix = None
             current.dict_suffix = None
             current.longest_prefix = None
@@ -184,15 +205,13 @@ class AhoCorasickTrie(Trie):
         Sets all suffix links in all nodes in this trie.
         '''
         self._suffix_links_set = True
-        # bfs
-        todo = deque([(self.root[char], self.root) for char in self.root])
-        while todo:
-            current, parent = todo.popleft()
+        for current, parent in self.bfs():
+            # skip the root node
+            if parent is None:
+                continue
             current.longest_prefix = parent.longest_prefix
             if parent.has_value:
                 current.longest_prefix = parent
-            for char in current:
-                todo.append((current[char], current))
             # the root doesn't get a suffix link
             # also, skip previously set suffix links
             if current.has_suffix:
