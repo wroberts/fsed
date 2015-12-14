@@ -22,7 +22,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 with open(path.join(here, 'fsed', 'VERSION'), encoding='utf-8') as f:
     version = f.read().strip()
-    
+
 setup(
     name='fsed',
 
