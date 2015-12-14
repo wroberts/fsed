@@ -62,6 +62,11 @@ class TestAhocorasick(unittest.TestCase):
                                                                     force_edges))))
 
     def test_debug1(self):
+        '''
+        Test case from Wikipedia.
+
+        https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
+        '''
         t = ahocorasick.Trie()
         t['a'] = '(a)'
         t['ab'] = '(ab)'
@@ -84,6 +89,7 @@ class TestAhocorasick(unittest.TestCase):
         self.assertEqual(t.pretty_print_str(), debug_1_ppstr)
 
     def test_debug2(self):
+        '''Hand-written test case.'''
         t = ahocorasick.AhoCorasickTrie()
         t['damn'] = '(damn)'
         t['dog'] = '(dog)'
@@ -128,6 +134,11 @@ class TestAhocorasick(unittest.TestCase):
         self.assertEqual(t.pretty_print_str(), debug_2_ppstr2)
 
     def test_debug3(self):
+        '''
+        Test case from Wikipedia.
+
+        https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
+        '''
         t = ahocorasick.AhoCorasickTrie()
         t['a'] = '(a)'
         t['ab'] = '(ab)'
@@ -160,6 +171,7 @@ class TestAhocorasick(unittest.TestCase):
                          '(a)(bc)(c)(a)b')
 
     def test_debug4(self):
+        '''Hand-written test case.'''
         t = ahocorasick.AhoCorasickTrie()
         t['x'] = '(x)'
         t['xabc'] = '(xabc)'
@@ -188,6 +200,7 @@ class TestAhocorasick(unittest.TestCase):
                          '(x)(ab)d')
 
     def test_debug5(self):
+        '''Hand-written test case.'''
         t = ahocorasick.AhoCorasickTrie()
         t['ac'] = '(ac)'
         t['acabx'] = '(acabx)'
@@ -210,6 +223,7 @@ class TestAhocorasick(unittest.TestCase):
                          '(ac)(ab)y')
 
     def test_debug7(self):
+        '''Hand-written test case.'''
         t = ahocorasick.AhoCorasickTrie()
         t['r 3'] = 'r_3'
         t['Rather he'] = 'Rather_he'
@@ -248,6 +262,7 @@ class TestAhocorasick(unittest.TestCase):
         self.assertEqual(t.pretty_print_str(), debug_7_ppstr)
 
     def test_debug8(self):
+        '''Hand-written test case.'''
         t = ahocorasick.AhoCorasickTrie()
         t['cart'] = '(cart)'
         t['cat'] = '(cat)'
