@@ -100,9 +100,7 @@ class Trie(object):
             if char not in current:
                 return False
             current = current[char]
-        if not current.has_value:
-            return False
-        return True
+        return current.has_value
 
     def __getitem__(self, seq):
         current = self.root
