@@ -12,6 +12,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from .. import ahocorasick
 from .. import fsed
 from click.testing import CliRunner
+from fsed.compat import PY3
 from os import path
 try:
     from StringIO import StringIO
@@ -51,6 +52,8 @@ def click_command_runner(cli, args=None):
         output = result.output
         with open(tempfile_path) as input_file:
             result = input_file.read()
+            if not PY3:
+                result = result.decode('utf-8')
     finally:
         # NOTE: To retain the tempfile if the test fails, remove
         # the try-finally clause.
@@ -158,9 +161,9 @@ class TestFsed(unittest.TestCase):
 
     def test_end2end(self):
         with gzip.open(path.join(HERE, 'sed-output.utf8.txt.gz')) as input_file:
-            sed_output = input_file.read()
+            sed_output = input_file.read().decode('utf-8')
         with gzip.open(path.join(HERE, 'perl-output.utf8.txt.gz')) as input_file:
-            perl_output = input_file.read()
+            perl_output = input_file.read().decode('utf-8')
         exit_code, output, result = click_command_runner(
             fsed.main, ['-w',
                         '-o', '%t',
