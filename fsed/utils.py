@@ -8,6 +8,8 @@ utils.py
 Utility functions.
 '''
 
+from __future__ import absolute_import
+from fsed.compat import PY3, string_type
 import sys
 
 def open_file(filename, mode='r'):
@@ -22,13 +24,15 @@ def open_file(filename, mode='r'):
         (('a' not in mode and 'w' not in mode) or hasattr(filename, 'write')) and
         hasattr(filename, '__iter__')):
         return filename
-    elif isinstance(filename, basestring):
+    elif isinstance(filename, string_type):
         if filename == '-' and 'r' in mode:
-            return sys.stdin
+            if PY3:
+                return sys.stdin.buffer
         elif filename == '-' and ('w' in mode or 'a' in mode):
-            return sys.stdout
+            if PY3:
+                return sys.stdout.buffer
         if filename.lower().count('.zip:'):
-            assert mode == 'r'
+            assert 'r' in mode
             assert filename.count(':') == 1
             import zipfile
             zipped_file = zipfile.ZipFile(filename.split(':')[0])

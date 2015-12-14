@@ -232,7 +232,7 @@ def main(pattern_filename, input_filenames, pattern_format,
     if not slow:
         warn_prefix_values(trie)
     LOGGER.info('writing to {}'.format(output_filename))
-    with open_file(output_filename, 'w') as output_file:
+    with open_file(output_filename, 'wb') as output_file:
         for input_filename in input_filenames:
             # search and replace
             with open_file(input_filename) as input_file:
