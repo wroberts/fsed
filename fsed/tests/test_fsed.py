@@ -11,11 +11,18 @@ Test the ``fsed`` module.
 from __future__ import absolute_import, print_function, unicode_literals
 from .. import ahocorasick
 from .. import fsed
+from click.testing import CliRunner
+from os import path
 try:
     from StringIO import StringIO
 except ImportError:
     from io import BytesIO as StringIO
+import gzip
+import os
+import tempfile
 import unittest
+
+HERE = path.abspath(path.dirname(__file__))
 
 class CMStringIO(StringIO):
     '''StringIO object with context manager.'''
@@ -30,6 +37,23 @@ class CMStringIO(StringIO):
 
     def __exit__(self, _type, _value, _tb):
         pass
+
+def click_command_runner(cli, args=None):
+    tempfile_path = tempfile.mkstemp()[1]
+    if args:
+        args = [(tempfile_path if x == '%t' else x) for x in args]
+    exit_code = output = result = None
+    try:
+        runner = CliRunner()
+        result = runner.invoke(cli, args)
+        exit_code = result.exit_code
+        output = result.output
+        result = open(tempfile_path).read()
+    finally:
+        # NOTE: To retain the tempfile if the test fails, remove
+        # the try-finally clause.
+        os.remove(tempfile_path)
+    return (exit_code, output, result)
 
 PATTERN_TSV = b'''\\bMarco Polo\tMarco_Polo
 Kublai Khan\tKublai_Khan
@@ -129,6 +153,29 @@ class TestFsed(unittest.TestCase):
                          '(a)(bc)(c)(a)b')
         self.assertEqual(fsed.rewrite_str_with_trie('abccab', trie, slow=True),
                          '(a)(bc)(c)(ab)')
+
+    def test_end2end(self):
+        with gzip.open(path.join(HERE, 'sed-output.utf8.txt.gz')) as input_file:
+            sed_output = input_file.read()
+        with gzip.open(path.join(HERE, 'perl-output.utf8.txt.gz')) as input_file:
+            perl_output = input_file.read()
+        exit_code, output, result = click_command_runner(
+            fsed.main, ['-w',
+                        '-o', '%t',
+                        path.join(HERE, 'fsed-testpats.tsv.gz'),
+                        path.join(HERE, 'fsed-testinput.utf8.txt.gz')])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(output, '')
+        self.assertEqual(result, sed_output)
+        self.assertEqual(result, perl_output)
+        exit_code, output, result = click_command_runner(
+            fsed.main, ['-o', '%t',
+                        path.join(HERE, 'fsed-testpats.wb.sed.gz'),
+                        path.join(HERE, 'fsed-testinput.utf8.txt.gz')])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(output, '')
+        self.assertEqual(result, sed_output)
+        self.assertEqual(result, perl_output)
 
 if __name__ == '__main__':
     unittest.main()
