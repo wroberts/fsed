@@ -37,6 +37,10 @@ class TrieNode(dict):
         self.suffix = None
         # likewise, dict_suffix is a tuple of (TrieNode, length)
         self.dict_suffix = None
+        # longest_prefix is a TrieNode (possibly None) which points to
+        # the longest prefix of this node that is an accepting state
+        # in the trie FSM
+        self.longest_prefix = None
 
     def __unicode__(self):
         if self.depth == 0:
@@ -173,6 +177,7 @@ class AhoCorasickTrie(Trie):
                 todo.append(current[char])
             current.suffix = None
             current.dict_suffix = None
+            current.longest_prefix = None
 
     def _set_suffix_links(self):
         '''
@@ -183,6 +188,9 @@ class AhoCorasickTrie(Trie):
         todo = deque([(self.root[char], self.root) for char in self.root])
         while todo:
             current, parent = todo.popleft()
+            current.longest_prefix = parent.longest_prefix
+            if parent.has_value:
+                current.longest_prefix = parent
             for char in current:
                 todo.append((current[char], current))
             # the root doesn't get a suffix link
