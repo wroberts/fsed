@@ -167,7 +167,7 @@ class TestFsed(unittest.TestCase):
         exit_code, output, result = click_command_runner(
             fsed.main, ['-w',
                         '-o', '%t',
-                        path.join(HERE, 'fsed-testpats.tsv.gz'),
+                        path.join(HERE, 'fsed-testpats.tsv'),
                         path.join(HERE, 'fsed-testinput.utf8.txt.gz')])
         self.assertEqual(exit_code, 0)
         #self.assertEqual(output, '')
@@ -175,7 +175,7 @@ class TestFsed(unittest.TestCase):
         self.assertEqual(result, perl_output)
         exit_code, output, result = click_command_runner(
             fsed.main, ['-o', '%t',
-                        path.join(HERE, 'fsed-testpats.wb.sed.gz'),
+                        path.join(HERE, 'fsed-testpats.wb.sed'),
                         path.join(HERE, 'fsed-testinput.utf8.txt.gz')])
         self.assertEqual(exit_code, 0)
         #self.assertEqual(output, '')
