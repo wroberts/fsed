@@ -1,6 +1,9 @@
 *.pyc
 *~
+.DS_Store
 /.coverage
 /.ropeproject/
+/build/
 /cover/
+/dist/
 /fsed.egg-info/
