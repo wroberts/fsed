@@ -12,7 +12,7 @@ from __future__ import absolute_import
 from fsed.compat import PY3, string_type
 import sys
 
-def open_file(filename, mode='r'):
+def open_file(filename, mode='rb'):
     """
     Opens a file for access with the given mode.  This function
     transparently wraps gzip and xz files as well as normal files.
