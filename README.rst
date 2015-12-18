@@ -21,6 +21,30 @@ details).
 
 Search and replace on file(s), with matching on fixed strings.
 
+``fsed`` is a tool specially designed for situations where you have to
+do *many* string search-and-replace operations with fixed strings
+(that is, ``fsed`` doesn't do regular expressions).  By doing all the
+searching and replacing on all the patterns at the same time, ``fsed``
+can be much faster than tools that do string rewriting one pattern at
+a time (like one-liners in ``sed`` or ``perl``).
+
+To do its searching, ``fsed`` uses the `Aho-Corasick algorithm`_,
+which is a very clever way of matching multiple patterns at the same
+time, and was used to implement the original `fgrep`_ Unix utility
+(now accessed as ``grep -F``).  This algorithm is capable of finding
+matches which overlap each other, and in these cases, ``fsed`` must
+choose which matches to rewrite.  The policy adopted by ``fsed`` is to
+be greedy, and always rewrite the shortest, leftmost match first.
+
+For illustration, imagine a situation where we would like to rewrite
+``a`` with ``b``, ``aa`` with ``c``, and ``aaa`` with ``d``.  What
+should we do when we see the input string ``aaa``?  Should we produce
+``bbb``, ``bc``, ``cb``, or ``d``?  ``fsed`` produces ``bbb`` in this
+case.
+
+.. _`Aho-Corasick algorithm`: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
+.. _fgrep: https://en.wikipedia.org/wiki/Grep#Variations
+
 Install
 =======
 
