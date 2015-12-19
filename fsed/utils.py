@@ -28,9 +28,11 @@ def open_file(filename, mode='rb'):
         if filename == '-' and 'r' in mode:
             if PY3:
                 return sys.stdin.buffer
+            return sys.stdin
         elif filename == '-' and ('w' in mode or 'a' in mode):
             if PY3:
                 return sys.stdout.buffer
+            return sys.stdout
         if filename.lower().count('.zip:'):
             assert 'r' in mode
             assert filename.count(':') == 1
