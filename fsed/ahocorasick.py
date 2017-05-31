@@ -271,6 +271,8 @@ class AhoCorasickTrie(Trie):
         Arguments:
         - `seq`:
         '''
+        # #1: seq must be stored in a container with a len() function
+        seq = list(seq)
         # chart is a (n-1) X (n) table
         # chart[0] represents all matches of length (0+1) = 1
         # chart[n-1] represents all matches/rewrites of length (n-1+1) = n
